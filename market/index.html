@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>Jquery Example-8</title>
+	  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+	  <script src="https://kit.fontawesome.com/e55efccdcb.js" crossorigin="anonymous"></script>
+	  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+	  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+	  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+	<script src="../js/jquery.js"></script>
+	<style>
+		.card_bd_img{
+			padding:8px !important;
+		}
+		.jumbotron{
+			    padding: 2rem 1rem !important;
+		}
+		.card{
+			padding:0px !important;
+			position:relative;
+		}
+		.cart_r{
+			position: absolute;
+			cursor: pointer;
+			right:2%;
+			top:2%;
+			transition:0.5s ease;
+		}
+		.cart_r:hover{
+			color:red !important;
+		}
+		.qty{
+			clear:both;
+			padding-top:8px;
+		}
+		.card-img-top{
+			width:100%;
+		}
+		.const_def{
+			height: 100%;
+		}
+	</style>
+</head>
+<body>
+	<div class="container-fluid jumbotron bg-primary">
+		<h2 class="  text-white text-center">Market</h2>
+	</div>
+	<div class="row container mx-auto ">
+		<div class="card col-sm-6 main_card">
+		    <div class="card-header bg-warning text-white text-center"><h3>Market</h3></div>
+		    <div class="card-body">
+		    	<div class="row market_all">
+			    	<div id="market_apple_pr" class="card col-md-6 shadow-lg" draggable="true" ondragstart="dragst(event)">
+			    		<i class="fas fa-times cart_r text-danger" onclick="close_btn(event)"></i>
+			    		<img class="card-img-top" src="https://bluecure.org/wp-content/uploads/2016/03/apples-prostate-cancer-curing-foods.jpg" alt="Card image">
+			    		<div class="card-body bg-primary card_bd_img clearfix">
+			    			<h4 class="text-white float-left">Apple</h4>
+			    			<h5><span class="text-white float-right pr">$8/Kg</span></h5>
+			    			<h5 class="text-white qty" style="">Left:50 Kg</h5>
+			    		</div>
+			    	</div>
+			    	
+
+		    	</div>
+		    </div> 
+		    
+	  	</div>
+
+	  	<div class="card col-sm-6 main_card" >
+		    <div class="card-header bg-warning text-white text-center"><h3>Cart</h3></div>
+		    <div class="card-body">
+		    	<div class="row const_def" ondragover="allow(event)" ondrop="app(event)">
+
+		    	</div>
+		    </div> 
+	  	</div>
+	  	<div id="total" class="w-100 rounded bg-info mt-2 text-white text-center"><h3>Total: 0$</h3></div>
+	</div>
+</body>
+<script>
+		let isThere=0;
+		let total =0;
+		function close_btn(event){
+			let elem =event.target.parentElement;
+			let id=elem.id;
+			let currentCart = $("#"+id +" .qty").text();
+				currentCart = currentCart.match(/\d+/ig);
+				currentCart = currentCart[0];
+				let price = $("#"+id +" .pr").text();
+					price = price.match(/\d+/ig);
+					price = price[0];
+					total -= Number(price);
+			if(currentCart==1){
+				$('#'+id).remove();
+				changeslive(id,"backward");
+			}
+			else{
+				changeslive(id,"backward");
+			}
+		}
+		$('.cart_r ').hide();
+		function dragst(event){
+			//if(event.target)
+			let imgC = document.getElementsByClassName('card-img-top')
+			let array_img = Array.from(imgC);
+			if(array_img.indexOf(event.target)>-1){
+				event.dataTransfer.setData("text",event.target.parentElement.id);
+				let qty = $("#"+event.target.parentElement.id +" .qty").text();
+				qty = qty.match(/\d+/ig);
+				qty = qty[0];
+				if(qty>1){
+					isThere=1;
+					
+				}
+			}
+			else{
+				let qty = $("#"+event.target.id +" .qty").text();
+				qty = qty.match(/\d+/ig);
+				qty = qty[0];
+				if(qty>1){
+					isThere=1;
+					
+				}
+				event.dataTransfer.setData("text",event.target.id);
+			}
+		}
+		function app(event){
+			event.preventDefault();
+			let content = event.dataTransfer.getData("text");
+			console.log(content);
+			if(event.target.classList[1]=="const_def"){
+				
+				let elem = document.getElementById(content)
+				let tmp1Id = $(elem).attr('id');
+				let priId = tmp1Id.replace("market","cart");
+				
+				if($("."+event.target.classList[1]+" #cart_apple_pr").length==0){
+					event.target.appendChild(elem);
+					
+					$("#"+elem.id).attr('id', priId);
+					let price = $("#"+priId +" .pr").text();
+					price = price.match(/\d+/ig);
+					price = price[0];
+					total += Number(price);
+					$("#"+priId+" .card_bd_img").addClass("bg-success");
+					$("#"+priId+" .cart_r").show();
+					let qty2 = $("#"+priId +" .qty").text();
+					
+					$("#"+priId +" .qty").text("QTY:1 Kg");
+					$("#"+priId).attr('draggable',"false");
+					$("#"+priId).removeAttr('ondragstart');
+					if(isThere==1){
+						$(elem).clone().appendTo('.market_all');
+						let tmpId = $(elem).attr('id');
+						let secId = tmpId.replace("cart","market");
+						$("#"+elem.id).attr('id', secId);
+						$("#"+secId+" .card_bd_img").removeClass("bg-success");
+						$("#"+secId).attr('draggable',"true");
+						$("#"+secId).attr('ondragstart',"dragst(event)");
+						$("#"+secId+" .cart_r").hide();
+						console.log(qty2);
+						qty2 = qty2.match(/\d+/ig);
+						qty2 = qty2[0];
+						qty2--;
+						$("#"+secId +" .qty").text("Left:"+qty2+" Kg");
+					}
+				}
+				else{
+					changeslive(content,"forward");
+				}
+			}
+			else{
+				changeslive(content,"forward");
+			}
+			$('#total h3').text("Total: "+total+"$");
+		}
+		function changeslive(content,status){
+				let priId = content.replace("market","cart");
+				if(status=="forward"){
+					let price = $("#"+priId +" .pr").text();
+					price = price.match(/\d+/ig);
+					price = price[0];
+					total += Number(price);
+				}
+				else{
+					priId = content.replace("cart","market");
+					let tmp = priId;
+					priId = content;
+					content = tmp;
+					
+				}
+				
+				let currentMarket = $("#"+content +" .qty").text();
+				currentMarket = currentMarket.match(/\d+/ig);
+				currentMarket = currentMarket[0];
+				if(status=="forward"){
+					currentMarket--;
+				}
+				else{
+					currentMarket++;
+				}
+				$("#"+content +" .qty").text("Left:"+currentMarket+" Kg");
+				let current = $("#"+priId +" .qty").text();
+				if(current!==""){
+					current = current.match(/\d+/ig);
+					current = current[0];
+					if(status=="forward"){
+						current++;
+					}
+					else{
+						current--;
+					}
+					$("#"+priId +" .qty").text("QTY:"+current+" Kg");
+				}
+				$('#total h3').text("Total: "+total+"$");
+		}
+		function allow(event){
+			event.preventDefault();
+		}
+	
+</script>
+</html>
